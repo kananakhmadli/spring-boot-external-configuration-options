@@ -1,5 +1,5 @@
 server:
-  port: 8018
+  port: 8019
 
 logging:
   level:
@@ -17,7 +17,7 @@ management:
 
 spring:
   application:
-    name: ms-demo-in-git
+    name: ms-demo-in-git-update
   messages:
     basename: i18n/messages
     encoding: UTF-8
