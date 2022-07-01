@@ -31,4 +31,4 @@ spring:
       enabled: false
 
 constant:
-  test: Some text here 2
+  test: Some text here 3
