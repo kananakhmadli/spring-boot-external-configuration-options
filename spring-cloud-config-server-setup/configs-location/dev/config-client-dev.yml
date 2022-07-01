@@ -1,12 +1,71 @@
 server:
-  port: 8019
+  port: 8010
 
 logging:
   level:
-    ROOT: WARN
-    az.kapitalbank.atlas: DEBUG
+    az.kapitalbank.atlas: WARN
+    ROOT: DEBUG
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: https://dev.atlas-keycloak.kapitalbank.az/auth/realms/Atlas/protocol/openid-connect/certs
+  main:
+    web-application-type: reactive
+  cloud:
+    consul:
+      enabled: false
+    gateway:
+      httpclient:
+        connect-timeout: 2000
+        response-timeout: 5000
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedHeaders: "*"
+            allowedMethods: "*"
+      routes:
+        - id: ms-qr-withdrawal
+          uri: http://ms-qr-withdrawal
+          predicates:
+            - Path=/api/qr-withdrawals/**
+          filters:
+            - StripPrefix=1
+
+        - id: ms-card
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/cards/**
+          filters:
+            - StripPrefix=1
+            - name: CircuitBreaker
+              args:
+                name: cardCircuitBreaker
+                fallbackUri: forward:/default-fallback
+
+        - id: ms-demo
+          uri: http://localhost:8019
+          predicates:
+            - Path=/api/demo/**
+          filters:
+            - StripPrefix=1
+            - name: CircuitBreaker
+              args:
+                name: demoCircuitBreaker
+                fallbackUri: forward:/default-fallback
+
+constant:
+  timeDuration: 4000
 
 management:
+  health:
+    circuitbreakers:
+      enabled: true
+    ratelimiters:
+      enabled: true
   endpoints:
     web:
       exposure:
@@ -15,20 +74,53 @@ management:
     health:
       show-details: always
 
-spring:
-  application:
-    name: ms-demo-in-git-update
-  messages:
-    basename: i18n/messages
-    encoding: UTF-8
-  mvc:
-    pathmatch:
-      matching-strategy: ant_path_matcher #issue with swagger & actuator
-  cloud:
-    vault:
-      enabled: false
-    consul:
-      enabled: false
+gateway:
+  circuit-breaker:
+    slidingWindowSize: 5
+    numberOfCallsInHalfOpenState: 4
+    failureRateThreshold: 50
+    waitDurationInOpenState: 35000
+    timeDuration: 4000
 
-constant:
-  test: Some text here 4
+resilience4j:
+  circuitbreaker:
+    instances:
+      demoCircuitBreaker:
+        registerHealthIndicator: true
+        slidingWindowType: count_based
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 30s
+        minimumNumberOfCalls: 5
+        eventConsumerBufferSize: 20
+        slidingWindowSize: 5
+        failureRateThreshold: 50
+        permittedNumberOfCallsInHalfOpenState: 2
+        slow-call-duration-threshold: 2s
+        slow-call-rate-threshold: 50
+
+#    configs:
+#      default:
+#        registerHealthIndicator: true
+#        slidingWindowType: count_based
+#        automaticTransitionFromOpenToHalfOpenEnabled: true
+#        waitDurationInOpenState: 30s
+#        minimumNumberOfCalls: 5
+#        eventConsumerBufferSize: 20
+#        slidingWindowSize: 5
+#        failureRateThreshold: 50
+#        permittedNumberOfCallsInHalfOpenState: 2
+#        slow-call-duration-threshold: 2s
+#        slow-call-rate-threshold: 50
+
+#      withAnnotationCB:
+#        registerHealthIndicator: true
+#        eventConsumerBufferSize: 5
+#        failureRateThreshold: 90
+#        minimumNumberOfCalls: 5
+#        automaticTransitionFromOpenToHalfOpenEnabled: true
+#        waitDurationInOpenState: 35s
+#        permittedNumberOfCallsInHalfOpenState: 3
+#        slidingWindowSize: 2
+#        slidingWindowType: COUNT_BASED
+
+#  Event STATE_TRANSITION published
