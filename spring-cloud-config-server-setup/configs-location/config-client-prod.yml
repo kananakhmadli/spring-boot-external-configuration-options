@@ -6,12 +6,6 @@ logging:
     ROOT: WARN
     az.kapitalbank.atlas: DEBUG
 
-#management:
-#  endpoints:
-#    web:
-#      exposure:
-#        include: [ "env", "health", "info" ]
-
 spring:
   application:
     name: ms-demo
@@ -26,60 +20,3 @@ spring:
       enabled: false
     consul:
       enabled: false
-
-#resilience4j:
-#  circuitbreaker:
-#
-#    instances:
-#      withAnnotationCB:
-#        registerHealthIndicator: true
-#        eventConsumerBufferSize: 5
-#        failureRateThreshold: 90
-#        minimumNumberOfCalls: 5
-#        automaticTransitionFromOpenToHalfOpenEnabled: true
-#        waitDurationInOpenState: 35s
-#        permittedNumberOfCallsInHalfOpenState: 3
-#        slidingWindowSize: 2
-#        slidingWindowType: COUNT_BASED
-#
-#  retry:
-#    instances:
-#      withAnnotationCB:
-#        maxRetryAttempts: 5
-#        waitDuration: 3s
-
-
-#resilience4j.timelimiter:
-#  instances:
-#    withAnnotationCB:
-#      timeoutDuration: 3s
-
-#esilience4j:
-#  timelimiter:
-#    configs:
-#      default:
-#        timeoutDuration: 1000
-#        cancelRunningFuture: true
-#    instances:
-#      timelimiterSlow:
-#        baseConfig: default
-#  bulkhead:
-#    configs:
-#      default:
-#        maxConcurrentCalls: 5
-#        maxWaitDuration: 0
-#    instances:
-#      greetingBulkhead:
-#        baseConfig: default
-
-management:
-  health:
-    circuitbreakers:
-      enabled: true
-  endpoints:
-    web:
-      exposure:
-        include: health
-  endpoint:
-    health:
-      show-details: always
