@@ -29,3 +29,6 @@ spring:
       enabled: false
     consul:
       enabled: false
+
+constant:
+  test: Some text here 2
