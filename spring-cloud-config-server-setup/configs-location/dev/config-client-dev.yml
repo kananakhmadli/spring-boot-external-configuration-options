@@ -58,7 +58,7 @@ spring:
                 fallbackUri: forward:/default-fallback
 
 constant:
-  timeDuration: 4000
+  timeDuration: 2000
 
 management:
   health:
