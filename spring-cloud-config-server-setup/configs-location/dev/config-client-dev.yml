@@ -80,7 +80,7 @@ gateway:
     numberOfCallsInHalfOpenState: 4
     failureRateThreshold: 50
     waitDurationInOpenState: 35000
-    timeDuration: 4000
+    timeDuration: 2000
 
 resilience4j:
   circuitbreaker:
